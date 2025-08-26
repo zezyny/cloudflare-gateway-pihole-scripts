@@ -1,0 +1,27 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # chạy mỗi ngày lúc 00:00 UTC
+  workflow_dispatch:       # cho phép chạy thủ công
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream
+        run: git remote add upstream https://github.com/mrrfv/cloudflare-gateway-pihole-scripts.git
+
+      - name: Fetch upstream
+        run: git fetch upstream
+
+      - name: Merge upstream into fork
+        run: |
+          git checkout main   
+          git merge upstream/main --no-edit || true
+          git push origin main
